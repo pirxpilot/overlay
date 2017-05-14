@@ -4,10 +4,10 @@
  */
 
 var Emitter = require('emitter');
-var tmpl = require('./template.html');
-var domify = require('domify');
 var event = require('event');
 var classes = require('classes');
+var domify = require('domify');
+var el = require('el-component');
 
 /**
  * Expose `overlay()`.
@@ -52,7 +52,7 @@ function Overlay(options) {
   options = options || {};
   this.target = options.target || document.body;
   this.closable = options.closable;
-  this.el = domify(tmpl);
+  this.el = domify(el('.overlay.hidden'));
   if (this.closable) {
 	event.bind(this.el, 'click', this.hide.bind(this));
     classes(this.el).add('closable');

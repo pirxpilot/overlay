@@ -12,16 +12,11 @@
     "event": "component-event",
     "classes": "component-classes"
   },
-  "browserify": {
-    "transform": [
-      "stringify"
-    ]
-  },
   "dependencies": {
+    "component-classes": "*",
     "component-emitter": "*",
     "component-event": "*",
     "domify": "*",
-    "component-classes": "*",
-    "stringify": "^3.1.0"
+    "el-component": "*"
   }
 }
