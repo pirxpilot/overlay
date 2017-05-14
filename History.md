@@ -1,4 +1,11 @@
 
+1.0.0 / 2017-05-13
+==================
+
+ * replace HTML template with el-component
+ * remove prefixed CSS properties
+ * remove component build
+
 0.3.6 / 2017-05-13
 ==================
 

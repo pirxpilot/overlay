@@ -1,7 +1,7 @@
 {
   "name": "@pirxpilot/overlay",
   "description": "Overlay component",
-  "version": "0.3.6",
+  "version": "1.0.0",
   "license": "MIT",
   "keywords": [
     "overlay",
