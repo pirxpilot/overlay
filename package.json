@@ -1,40 +1,27 @@
 {
-  "name": "overlay-component",
+  "name": "@pirxpilot/overlay",
   "description": "Overlay component",
   "version": "0.3.6",
+  "license": "MIT",
   "keywords": [
     "overlay",
     "ui"
   ],
+  "repository": "pirxpilot/overlay",
   "browser": {
     "emitter": "component-emitter",
     "event": "component-event",
     "classes": "component-classes"
   },
-  "browserify": {
-    "transform": [
-      "stringify"
-    ]
-  },
   "dependencies": {
+    "component-classes": "*",
     "component-emitter": "*",
     "component-event": "*",
     "domify": "*",
-    "component-classes": "*",
-    "stringify": "^3.1.0"
+    "el-component": "*"
   },
-  "component": {
-    "scripts": {
-      "overlay/index.js": "index.js",
-      "overlay/template.js": "template.js"
-    },
-    "styles": [
-      "overlay.css"
-    ]
-  },
-  "style": "overlay.css",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/component/overlay.git"
-  }
+  "files": [
+    "index.js",
+    "overlay.css"
+  ]
 }
