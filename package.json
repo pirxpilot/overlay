@@ -2,6 +2,7 @@
   "name": "@pirxpilot/overlay",
   "description": "Overlay component",
   "version": "0.3.6",
+  "license": "MIT",
   "keywords": [
     "overlay",
     "ui"
@@ -18,5 +19,9 @@
     "component-event": "*",
     "domify": "*",
     "el-component": "*"
-  }
+  },
+  "files": [
+    "index.js",
+    "overlay.css"
+  ]
 }
