@@ -1,14 +1,30 @@
+PROJECT=overlay
+CSS=overlay.css
 
-build: overlay.css index.js template.html components
-	@component build
+all: check compile
 
-components:
-	@component install -v
+check: lint
+
+lint:
+	jshint index.js
+
+compile: build/build.js build/build.css
+
+build:
+	mkdir -p $@
+
+build/build.js: node_modules index.js | build
+	browserify --require ./index.js:$(PROJECT) --outfile $@
+
+.DELETE_ON_ERROR: build/build.js
+
+build/build.css: $(CSS) | build
+	cat $^ > $@
+
+node_modules: package.json
+	npm install
 
 clean:
-	rm -fr build components
+	rm -fr build node_modules
 
-test: build
-	open test/index.html
-
-.PHONY: clean test
+.PHONY: clean lint check all build
