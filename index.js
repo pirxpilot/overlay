@@ -5,7 +5,6 @@
 
 var Emitter = require('emitter');
 var event = require('event');
-var classes = require('classes');
 var domify = require('domify');
 var el = require('el-component');
 
@@ -55,7 +54,7 @@ function Overlay(options) {
   this.el = domify(el('.overlay.hidden'));
   if (this.closable) {
 	event.bind(this.el, 'click', this.hide.bind(this));
-    classes(this.el).add('closable');
+    this.el.classList.add('closable');
   }
 }
 
@@ -82,7 +81,7 @@ Overlay.prototype.show = function(){
 
   //class removed in a timeout to save animation
   setTimeout( function () {
-  	classes(self.el).remove('hidden');
+  	self.el.classList.remove('hidden');
   });
 
   return this;
@@ -114,7 +113,7 @@ Overlay.prototype.hide = function(){
 Overlay.prototype.remove = function(){
   var self = this;
   this.emit('close');
-  classes(this.el).add('hidden');
+  this.el.classList.add('hidden');
   setTimeout(function(){
     self.target.removeChild(self.el);
   }, 350);
