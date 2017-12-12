@@ -1,4 +1,9 @@
 
+1.0.1 / 2017-12-12
+==================
+
+ * remove dependecy on component-event and component-classes
+
 1.0.0 / 2017-05-13
 ==================
 
