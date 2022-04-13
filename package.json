@@ -9,9 +9,7 @@
   ],
   "repository": "pirxpilot/overlay",
   "dependencies": {
-    "component-emitter": "*",
-    "domify": "*",
-    "el-component": "*"
+    "component-emitter": "*"
   },
   "files": [
     "index.js",

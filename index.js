@@ -1,6 +1,4 @@
 var Emitter = require('component-emitter');
-var domify = require('domify');
-var el = require('el-component');
 
 /**
  * Expose `overlay()`.
@@ -45,7 +43,8 @@ function Overlay(options) {
   options = options || {};
   this.target = options.target || document.body;
   this.closable = options.closable;
-  this.el = domify(el('.overlay.hidden'));
+  this.el = document.createElement('div');
+  this.el.className = 'overlay hidden';
   if (this.closable) {
   	this.el.addEventListener('click', this.hide.bind(this));
     this.el.classList.add('closable');
