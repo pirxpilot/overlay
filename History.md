@@ -1,4 +1,9 @@
 
+1.0.3 / 2022-04-13
+==================
+
+ * remove domify and el-component dependencies
+
 1.0.2 / 2022-04-13
 ==================
 
