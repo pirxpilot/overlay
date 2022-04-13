@@ -1,9 +1,4 @@
-
-/**
- * Module dependencies.
- */
-
-var Emitter = require('emitter');
+var Emitter = require('component-emitter');
 var domify = require('domify');
 var el = require('el-component');
 
