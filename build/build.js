@@ -1,211 +1,12 @@
-
-/**
- * Require the given path.
- *
- * @param {String} path
- * @return {Object} exports
- * @api public
- */
-
-function require(path, parent, orig) {
-  var resolved = require.resolve(path);
-
-  // lookup failed
-  if (null == resolved) {
-    orig = orig || path;
-    parent = parent || 'root';
-    var err = new Error('Failed to require "' + orig + '" from "' + parent + '"');
-    err.path = orig;
-    err.parent = parent;
-    err.require = true;
-    throw err;
-  }
-
-  var module = require.modules[resolved];
-
-  // perform real require()
-  // by invoking the module's
-  // registered function
-  if (!module._resolving && !module.exports) {
-    var mod = {};
-    mod.exports = {};
-    mod.client = mod.component = true;
-    module._resolving = true;
-    module.call(this, mod.exports, require.relative(resolved), mod);
-    delete module._resolving;
-    module.exports = mod.exports;
-  }
-
-  return module.exports;
-}
-
-/**
- * Registered modules.
- */
-
-require.modules = {};
-
-/**
- * Registered aliases.
- */
-
-require.aliases = {};
-
-/**
- * Resolve `path`.
- *
- * Lookup:
- *
- *   - PATH/index.js
- *   - PATH.js
- *   - PATH
- *
- * @param {String} path
- * @return {String} path or null
- * @api private
- */
-
-require.resolve = function(path) {
-  if (path.charAt(0) === '/') path = path.slice(1);
-
-  var paths = [
-    path,
-    path + '.js',
-    path + '.json',
-    path + '/index.js',
-    path + '/index.json'
-  ];
-
-  for (var i = 0; i < paths.length; i++) {
-    var path = paths[i];
-    if (require.modules.hasOwnProperty(path)) return path;
-    if (require.aliases.hasOwnProperty(path)) return require.aliases[path];
-  }
-};
-
-/**
- * Normalize `path` relative to the current path.
- *
- * @param {String} curr
- * @param {String} path
- * @return {String}
- * @api private
- */
-
-require.normalize = function(curr, path) {
-  var segs = [];
-
-  if ('.' != path.charAt(0)) return path;
-
-  curr = curr.split('/');
-  path = path.split('/');
-
-  for (var i = 0; i < path.length; ++i) {
-    if ('..' == path[i]) {
-      curr.pop();
-    } else if ('.' != path[i] && '' != path[i]) {
-      segs.push(path[i]);
-    }
-  }
-
-  return curr.concat(segs).join('/');
-};
-
-/**
- * Register module at `path` with callback `definition`.
- *
- * @param {String} path
- * @param {Function} definition
- * @api private
- */
-
-require.register = function(path, definition) {
-  require.modules[path] = definition;
-};
-
-/**
- * Alias a module definition.
- *
- * @param {String} from
- * @param {String} to
- * @api private
- */
-
-require.alias = function(from, to) {
-  if (!require.modules.hasOwnProperty(from)) {
-    throw new Error('Failed to alias "' + from + '", it does not exist');
-  }
-  require.aliases[to] = from;
-};
-
-/**
- * Return a require function relative to the `parent` path.
- *
- * @param {String} parent
- * @return {Function}
- * @api private
- */
-
-require.relative = function(parent) {
-  var p = require.normalize(parent, '..');
-
-  /**
-   * lastIndexOf helper.
-   */
-
-  function lastIndexOf(arr, obj) {
-    var i = arr.length;
-    while (i--) {
-      if (arr[i] === obj) return i;
-    }
-    return -1;
-  }
-
-  /**
-   * The relative require() itself.
-   */
-
-  function localRequire(path) {
-    var resolved = localRequire.resolve(path);
-    return require(resolved, parent, path);
-  }
-
-  /**
-   * Resolve relative to the parent.
-   */
-
-  localRequire.resolve = function(path) {
-    var c = path.charAt(0);
-    if ('/' == c) return path.slice(1);
-    if ('.' == c) return require.normalize(p, path);
-
-    // resolve deps by returning
-    // the dep in the nearest "deps"
-    // directory
-    var segs = parent.split('/');
-    var i = lastIndexOf(segs, 'deps') + 1;
-    if (!i) i = 0;
-    path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
-    return path;
-  };
-
-  /**
-   * Check if module is defined at `path`.
-   */
-
-  localRequire.exists = function(path) {
-    return require.modules.hasOwnProperty(localRequire.resolve(path));
-  };
-
-  return localRequire;
-};
-require.register("component-emitter/index.js", function(exports, require, module){
+require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
  */
 
-module.exports = Emitter;
+if (typeof module !== 'undefined') {
+  module.exports = Emitter;
+}
 
 /**
  * Initialize a new `Emitter`.
@@ -244,7 +45,7 @@ function mixin(obj) {
 Emitter.prototype.on =
 Emitter.prototype.addEventListener = function(event, fn){
   this._callbacks = this._callbacks || {};
-  (this._callbacks[event] = this._callbacks[event] || [])
+  (this._callbacks['$' + event] = this._callbacks['$' + event] || [])
     .push(fn);
   return this;
 };
@@ -260,11 +61,8 @@ Emitter.prototype.addEventListener = function(event, fn){
  */
 
 Emitter.prototype.once = function(event, fn){
-  var self = this;
-  this._callbacks = this._callbacks || {};
-
   function on() {
-    self.off(event, on);
+    this.off(event, on);
     fn.apply(this, arguments);
   }
 
@@ -296,12 +94,12 @@ Emitter.prototype.removeEventListener = function(event, fn){
   }
 
   // specific event
-  var callbacks = this._callbacks[event];
+  var callbacks = this._callbacks['$' + event];
   if (!callbacks) return this;
 
   // remove all handlers
   if (1 == arguments.length) {
-    delete this._callbacks[event];
+    delete this._callbacks['$' + event];
     return this;
   }
 
@@ -314,6 +112,13 @@ Emitter.prototype.removeEventListener = function(event, fn){
       break;
     }
   }
+
+  // Remove event specific arrays for event types that no
+  // one is subscribed for to avoid memory leak.
+  if (callbacks.length === 0) {
+    delete this._callbacks['$' + event];
+  }
+
   return this;
 };
 
@@ -327,8 +132,13 @@ Emitter.prototype.removeEventListener = function(event, fn){
 
 Emitter.prototype.emit = function(event){
   this._callbacks = this._callbacks || {};
-  var args = [].slice.call(arguments, 1)
-    , callbacks = this._callbacks[event];
+
+  var args = new Array(arguments.length - 1)
+    , callbacks = this._callbacks['$' + event];
+
+  for (var i = 1; i < arguments.length; i++) {
+    args[i - 1] = arguments[i];
+  }
 
   if (callbacks) {
     callbacks = callbacks.slice(0);
@@ -350,7 +160,7 @@ Emitter.prototype.emit = function(event){
 
 Emitter.prototype.listeners = function(event){
   this._callbacks = this._callbacks || {};
-  return this._callbacks[event] || [];
+  return this._callbacks['$' + event] || [];
 };
 
 /**
@@ -365,14 +175,29 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-});
-require.register("component-domify/index.js", function(exports, require, module){
+},{}],2:[function(require,module,exports){
 
 /**
  * Expose `parse`.
  */
 
 module.exports = parse;
+
+/**
+ * Tests for browser support.
+ */
+
+var innerHTMLBug = false;
+var bugTestDiv;
+if (typeof document !== 'undefined') {
+  bugTestDiv = document.createElement('div');
+  // Setup
+  bugTestDiv.innerHTML = '  <link/><table></table><a href="/a">a</a><input type="checkbox"/>';
+  // Make sure that link elements get serialized correctly by innerHTML
+  // This requires a wrapper element in IE
+  innerHTMLBug = !bugTestDiv.getElementsByTagName('link').length;
+  bugTestDiv = undefined;
+}
 
 /**
  * Wrap map from jquery.
@@ -382,7 +207,9 @@ var map = {
   legend: [1, '<fieldset>', '</fieldset>'],
   tr: [2, '<table><tbody>', '</tbody></table>'],
   col: [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
-  _default: [0, '', '']
+  // for script/link/style tags to work in IE6-8, you have to wrap
+  // in a div with a non-whitespace character in front, ha!
+  _default: innerHTMLBug ? [1, 'X<div>', '</div>'] : [0, '', '']
 };
 
 map.td =
@@ -397,29 +224,36 @@ map.colgroup =
 map.caption =
 map.tfoot = [1, '<table>', '</table>'];
 
-map.text =
-map.circle =
+map.polyline =
 map.ellipse =
+map.polygon =
+map.circle =
+map.text =
 map.line =
 map.path =
-map.polygon =
-map.polyline =
-map.rect = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
+map.rect =
+map.g = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
 
 /**
- * Parse `html` and return the children.
+ * Parse `html` and return a DOM Node instance, which could be a TextNode,
+ * HTML DOM Node of some kind (<div> for example), or a DocumentFragment
+ * instance, depending on the contents of the `html` string.
  *
- * @param {String} html
- * @return {Array}
+ * @param {String} html - HTML string to "domify"
+ * @param {Document} doc - The `document` instance to create the Node for
+ * @return {DOMNode} the TextNode, DOM Node, or DocumentFragment instance
  * @api private
  */
 
-function parse(html) {
+function parse(html, doc) {
   if ('string' != typeof html) throw new TypeError('String expected');
-  
+
+  // default to the global `document` object
+  if (!doc) doc = document;
+
   // tag name
   var m = /<([\w:]+)/.exec(html);
-  if (!m) return document.createTextNode(html);
+  if (!m) return doc.createTextNode(html);
 
   html = html.replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace
 
@@ -427,17 +261,17 @@ function parse(html) {
 
   // body support
   if (tag == 'body') {
-    var el = document.createElement('html');
+    var el = doc.createElement('html');
     el.innerHTML = html;
     return el.removeChild(el.lastChild);
   }
 
   // wrap map
-  var wrap = map[tag] || map._default;
+  var wrap = Object.prototype.hasOwnProperty.call(map, tag) ? map[tag] : map._default;
   var depth = wrap[0];
   var prefix = wrap[1];
   var suffix = wrap[2];
-  var el = document.createElement('div');
+  var el = doc.createElement('div');
   el.innerHTML = prefix + html + suffix;
   while (depth--) el = el.lastChild;
 
@@ -447,7 +281,7 @@ function parse(html) {
   }
 
   // several elements
-  var fragment = document.createDocumentFragment();
+  var fragment = doc.createDocumentFragment();
   while (el.firstChild) {
     fragment.appendChild(el.removeChild(el.firstChild));
   }
@@ -455,251 +289,93 @@ function parse(html) {
   return fragment;
 }
 
-});
-require.register("component-event/index.js", function(exports, require, module){
-var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
-    unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
-    prefix = bind !== 'addEventListener' ? 'on' : '';
+},{}],3:[function(require,module,exports){
+// see: http://www.w3.org/html/wg/drafts/html/master/single-page.html#void-elements
+var voids = [
+  'area', 'base', 'br', 'col', 'embed',
+  'hr', 'img', 'input', 'keygen', 'link',
+  'menuitem', 'meta', 'param', 'source', 'track', 'wbr'
+].reduce(function(o, v) {
+  o[v] = true;
+  return o;
+}, Object.create(null));
 
-/**
- * Bind `el` event `type` to `fn`.
- *
- * @param {Element} el
- * @param {String} type
- * @param {Function} fn
- * @param {Boolean} capture
- * @return {Function}
- * @api public
- */
-
-exports.bind = function(el, type, fn, capture){
-  el[bind](prefix + type, fn, capture || false);
-  return fn;
-};
-
-/**
- * Unbind `el` event `type`'s callback `fn`.
- *
- * @param {Element} el
- * @param {String} type
- * @param {Function} fn
- * @param {Boolean} capture
- * @return {Function}
- * @api public
- */
-
-exports.unbind = function(el, type, fn, capture){
-  el[unbind](prefix + type, fn, capture || false);
-  return fn;
-};
-});
-require.register("component-indexof/index.js", function(exports, require, module){
-module.exports = function(arr, obj){
-  if (arr.indexOf) return arr.indexOf(obj);
-  for (var i = 0; i < arr.length; ++i) {
-    if (arr[i] === obj) return i;
+function htmlTag(tag, content, attrStr) {
+  var text = ['<',
+    tag,
+    attrStr ? ' ' + attrStr :  '',
+    '>'
+  ];
+  if(!voids[tag]) {
+    text = text.concat([
+      content || '',
+      '</',
+      tag,
+      '>'
+    ]);
   }
-  return -1;
-};
-});
-require.register("component-classes/index.js", function(exports, require, module){
-/**
- * Module dependencies.
- */
-
-var index = require('indexof');
-
-/**
- * Whitespace regexp.
- */
-
-var re = /\s+/;
-
-/**
- * toString reference.
- */
-
-var toString = Object.prototype.toString;
-
-/**
- * Wrap `el` in a `ClassList`.
- *
- * @param {Element} el
- * @return {ClassList}
- * @api public
- */
-
-module.exports = function(el){
-  return new ClassList(el);
-};
-
-/**
- * Initialize a new ClassList for `el`.
- *
- * @param {Element} el
- * @api private
- */
-
-function ClassList(el) {
-  if (!el) throw new Error('A DOM element reference is required');
-  this.el = el;
-  this.list = el.classList;
+  return text;
 }
 
-/**
- * Add class `name` if not already present.
- *
- * @param {String} name
- * @return {ClassList}
- * @api public
- */
-
-ClassList.prototype.add = function(name){
-  // classList
-  if (this.list) {
-    this.list.add(name);
-    return this;
-  }
-
-  // fallback
-  var arr = this.array();
-  var i = index(arr, name);
-  if (!~i) arr.push(name);
-  this.el.className = arr.join(' ');
-  return this;
-};
-
-/**
- * Remove class `name` when present, or
- * pass a regular expression to remove
- * any which match.
- *
- * @param {String|RegExp} name
- * @return {ClassList}
- * @api public
- */
-
-ClassList.prototype.remove = function(name){
-  if ('[object RegExp]' == toString.call(name)) {
-    return this.removeMatching(name);
-  }
-
-  // classList
-  if (this.list) {
-    this.list.remove(name);
-    return this;
-  }
-
-  // fallback
-  var arr = this.array();
-  var i = index(arr, name);
-  if (~i) arr.splice(i, 1);
-  this.el.className = arr.join(' ');
-  return this;
-};
-
-/**
- * Remove all classes matching `re`.
- *
- * @param {RegExp} re
- * @return {ClassList}
- * @api private
- */
-
-ClassList.prototype.removeMatching = function(re){
-  var arr = this.array();
-  for (var i = 0; i < arr.length; i++) {
-    if (re.test(arr[i])) {
-      this.remove(arr[i]);
-    }
-  }
-  return this;
-};
-
-/**
- * Toggle class `name`, can force state via `force`.
- *
- * For browsers that support classList, but do not support `force` yet,
- * the mistake will be detected and corrected.
- *
- * @param {String} name
- * @param {Boolean} force
- * @return {ClassList}
- * @api public
- */
-
-ClassList.prototype.toggle = function(name, force){
-  // classList
-  if (this.list) {
-    if ("undefined" !== typeof force) {
-      if (force !== this.list.toggle(name, force)) {
-        this.list.toggle(name); // toggle again to correct
-      }
-    } else {
-      this.list.toggle(name);
-    }
-    return this;
-  }
-
-  // fallback
-  if ("undefined" !== typeof force) {
-    if (!force) {
-      this.remove(name);
-    } else {
-      this.add(name);
-    }
+function xmlTag(tag, content, attrStr) {
+  var text = ['<',
+    tag,
+    attrStr ? ' ' + attrStr :  '',
+  ];
+  if (!content || !content.length) {
+    text.push('/>');
   } else {
-    if (this.has(name)) {
-      this.remove(name);
-    } else {
-      this.add(name);
-    }
+    text = text.concat([
+      '>',
+      content,
+      '</',
+      tag,
+      '>'
+    ]);
+  }
+  return text;
+}
+
+function toStr(tagFn, tag, content, attrs) {
+  var attrStr, classes, ids;
+
+  if (typeof content !== 'string') {
+    attrs = content;
+    content = '';
   }
 
-  return this;
-};
+  tag = tag || '';
+  attrs = attrs || {};
 
-/**
- * Return an array of classes.
- *
- * @return {Array}
- * @api public
- */
+  classes = tag.split('.');
+  tag = classes.shift() || 'div';
+  if (classes.length) {
+    classes = classes.join(' ');
+    if (attrs['class']) {
+      attrs['class'] += ' ' + classes;
+    } else {
+      attrs['class'] = classes;
+    }
+  }
+  ids = tag.split('#');
+  if (ids.length > 1) {
+    tag = ids[0] || 'div';
+    attrs.id = ids[1];
+  }
 
-ClassList.prototype.array = function(){
-  var str = this.el.className.replace(/^\s+|\s+$/g, '');
-  var arr = str.split(re);
-  if ('' === arr[0]) arr.shift();
-  return arr;
-};
+  attrStr = Object.keys(attrs).map(function(attr) {
+    return attr +  '="' + attrs[attr] + '"';
+  }).join(' ');
 
-/**
- * Check if class `name` is present.
- *
- * @param {String} name
- * @return {ClassList}
- * @api public
- */
+  return tagFn(tag, content, attrStr).join('');
+}
 
-ClassList.prototype.has =
-ClassList.prototype.contains = function(name){
-  return this.list
-    ? this.list.contains(name)
-    : !! ~index(this.array(), name);
-};
-
-});
-require.register("overlay/index.js", function(exports, require, module){
-
-/**
- * Module dependencies.
- */
-
-var Emitter = require('emitter');
-var tmpl = require('./template.html');
+module.exports = toStr.bind(null, htmlTag);
+module.exports.xml = toStr.bind(null, xmlTag);
+},{}],"overlay":[function(require,module,exports){
+var Emitter = require('component-emitter');
 var domify = require('domify');
-var event = require('event');
-var classes = require('classes');
+var el = require('el-component');
 
 /**
  * Expose `overlay()`.
@@ -744,11 +420,10 @@ function Overlay(options) {
   options = options || {};
   this.target = options.target || document.body;
   this.closable = options.closable;
-  this.el = domify(tmpl);
-  this.target.appendChild(this.el);
+  this.el = domify(el('.overlay.hidden'));
   if (this.closable) {
-	event.bind(this.el, 'click', this.hide.bind(this));
-    classes(this.el).add('closable');
+  	this.el.addEventListener('click', this.hide.bind(this));
+    this.el.classList.add('closable');
   }
 }
 
@@ -768,8 +443,16 @@ Emitter(Overlay.prototype);
  */
 
 Overlay.prototype.show = function(){
+  var self = this;
+
   this.emit('show');
-  classes(this.el).remove('hidden');
+  this.target.appendChild(this.el);
+
+  //class removed in a timeout to save animation
+  setTimeout(function () {
+  	self.el.classList.remove('hidden');
+  });
+
   return this;
 };
 
@@ -799,35 +482,12 @@ Overlay.prototype.hide = function(){
 Overlay.prototype.remove = function(){
   var self = this;
   this.emit('close');
-  classes(this.el).add('hidden');
+  this.el.classList.add('hidden');
   setTimeout(function(){
     self.target.removeChild(self.el);
-  }, 2000);
+  }, 350);
   return this;
 };
 
 
-});
-
-
-
-
-
-
-
-
-require.register("overlay/template.html", function(exports, require, module){
-module.exports = '<div class="overlay hidden"></div>\n';
-});
-require.alias("component-emitter/index.js", "overlay/deps/emitter/index.js");
-require.alias("component-emitter/index.js", "emitter/index.js");
-
-require.alias("component-domify/index.js", "overlay/deps/domify/index.js");
-require.alias("component-domify/index.js", "domify/index.js");
-
-require.alias("component-event/index.js", "overlay/deps/event/index.js");
-require.alias("component-event/index.js", "event/index.js");
-
-require.alias("component-classes/index.js", "overlay/deps/classes/index.js");
-require.alias("component-classes/index.js", "classes/index.js");
-require.alias("component-indexof/index.js", "component-classes/deps/indexof/index.js");
+},{"component-emitter":1,"domify":2,"el-component":3}]},{},[]);
