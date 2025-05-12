@@ -13,16 +13,21 @@ compile: build/build.js build/build.css
 build:
 	mkdir -p $@
 
-build/build.js: node_modules index.js | build
-	browserify --require ./index.js:$(PROJECT) --outfile $@
-
-.DELETE_ON_ERROR: build/build.js
+build/build.js: index.js | build node_modules
+	esbuild \
+					--bundle \
+					--sourcemap \
+					--define:DEBUG="true" \
+					--global-name=$(PROJECT) \
+					--outfile=$@ \
+					index.js
 
 build/build.css: $(CSS) | build
 	cat $^ > $@
 
 node_modules: package.json
-	npm install
+	yarn
+	touch $@
 
 clean:
 	rm -fr build node_modules
