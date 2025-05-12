@@ -6,7 +6,10 @@ all: check compile
 check: lint
 
 lint:
-	jshint index.js
+	biome ci
+
+format:
+	biome check --fix
 
 compile: build/build.js build/build.css
 
@@ -32,4 +35,4 @@ node_modules: package.json
 clean:
 	rm -fr build node_modules
 
-.PHONY: clean lint check all build
+.PHONY: clean lint check all build compile format
