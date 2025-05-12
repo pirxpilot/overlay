@@ -1,4 +1,11 @@
 
+2.0.0 / 2025-05-12
+==================
+
+ * transition to ESM format
+ * rewrite in ES6
+ * use esbuild instead of browserify
+
 1.0.3 / 2022-04-13
 ==================
 
