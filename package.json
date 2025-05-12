@@ -3,13 +3,18 @@
   "description": "Overlay component",
   "version": "1.0.3",
   "license": "MIT",
+  "type": "module",
+  "exports": "./index.js",
   "keywords": [
     "overlay",
     "ui"
   ],
-  "repository": "pirxpilot/overlay",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pirxpilot/overlay.git"
+  },
   "dependencies": {
-    "component-emitter": "*"
+    "component-emitter": "~1 || ~2"
   },
   "files": [
     "index.js",
