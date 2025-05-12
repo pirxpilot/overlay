@@ -26,10 +26,11 @@
     </div>
 
     <script>
-    var o = overlay({ closable: true });
+    overlay = overlay.default;
+    const o = overlay({ closable: true });
 
-    o.on('hide', function(){
-      var div = document.querySelector('body > div');
+    o.on('hide', () =>{
+      const div = document.querySelector('body > div');
       overlay(div).show();
     });
 

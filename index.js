@@ -1,7 +1,4 @@
-const Emitter = require('component-emitter');
-
-module.exports = overlay;
-overlay.Overlay = Overlay;
+import Emitter from 'component-emitter';
 
 /**
  * Return a new `Overlay` with the given `options`.
@@ -11,7 +8,7 @@ overlay.Overlay = Overlay;
  * @api public
  */
 
-function overlay(options = {}) {
+export default function overlay(options = {}) {
   // element
   if (options.nodeName) {
     options = { target: options };
@@ -20,7 +17,7 @@ function overlay(options = {}) {
   return new Overlay(options);
 }
 
-class Overlay extends Emitter {
+export class Overlay extends Emitter {
   /**
    * Initialize a new `Overlay`.
    *
