@@ -1,8 +1,8 @@
 <!DOCTYPE 5>
-<html>
+<html lang="en">
   <head>
     <title>Overlay</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../build/build.css" />
     <style>
       body > div:not(.overlay) {
@@ -26,15 +26,15 @@
     </div>
 
     <script>
-    overlay = overlay.default;
-    const o = overlay({ closable: true });
+      overlay = overlay.default;
+      const o = overlay({ closable: true });
 
-    o.on('hide', () =>{
-      const div = document.querySelector('body > div');
-      overlay(div).show();
-    });
+      o.on('hide', () => {
+        const div = document.querySelector('body > div');
+        overlay(div).show();
+      });
 
-    o.show();
+      o.show();
     </script>
   </body>
 </html>
